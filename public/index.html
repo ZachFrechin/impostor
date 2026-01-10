@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="violet">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Imposteur - Jeu Multijoueur</title>
+  <meta name="description" content="Jeu de l'Imposteur en ligne - Trouvez qui a le mot différent !">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Theme Selector Floating -->
+  <div id="theme-selector" class="theme-selector">
+    <button class="theme-toggle" id="theme-toggle" title="Changer le thème">🎨</button>
+    <div class="theme-options hidden" id="theme-options">
+      <button data-theme="violet" class="theme-btn active" title="Violet"><span
+          style="background: linear-gradient(135deg, #667eea, #764ba2)"></span></button>
+      <button data-theme="ocean" class="theme-btn" title="Océan"><span
+          style="background: linear-gradient(135deg, #00c6fb, #005bea)"></span></button>
+      <button data-theme="sunset" class="theme-btn" title="Coucher de soleil"><span
+          style="background: linear-gradient(135deg, #f83600, #f9d423)"></span></button>
+      <button data-theme="forest" class="theme-btn" title="Forêt"><span
+          style="background: linear-gradient(135deg, #11998e, #38ef7d)"></span></button>
+      <button data-theme="candy" class="theme-btn" title="Bonbon"><span
+          style="background: linear-gradient(135deg, #f093fb, #f5576c)"></span></button>
+      <button data-theme="midnight" class="theme-btn" title="Minuit"><span
+          style="background: linear-gradient(135deg, #232526, #414345)"></span></button>
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- Écran d'accueil -->
+    <section id="home-screen" class="screen active">
+      <div class="container">
+        <header class="hero">
+          <div class="logo">
+            <span class="logo-icon">🕵️</span>
+            <h1>L'Imposteur</h1>
+          </div>
+          <p class="tagline">Trouvez qui a le mot différent !</p>
+        </header>
+
+        <div class="cards">
+          <div class="card">
+            <h2>Créer une partie</h2>
+            <p>Invitez vos amis à rejoindre votre salle</p>
+            <form id="create-form">
+              <input type="text" id="create-name" placeholder="Votre pseudo" maxlength="15" required autocomplete="off">
+              <button type="submit" class="btn btn-primary">
+                <span>Créer</span>
+                <span class="btn-icon">→</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="divider">
+            <span>ou</span>
+          </div>
+
+          <div class="card">
+            <h2>Rejoindre une partie</h2>
+            <p>Entrez le code de la salle</p>
+            <form id="join-form">
+              <input type="text" id="join-name" placeholder="Votre pseudo" maxlength="15" required autocomplete="off">
+              <input type="text" id="join-code" placeholder="Code de salle (ex: ABC123)" maxlength="6" required
+                autocomplete="off" style="text-transform: uppercase;">
+              <button type="submit" class="btn btn-secondary">
+                <span>Rejoindre</span>
+                <span class="btn-icon">→</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="rules">
+          <h3>📜 Règles du jeu</h3>
+          <ol>
+            <li>Chaque joueur reçoit un <strong>mot secret</strong></li>
+            <li>L'imposteur reçoit un <strong>mot différent</strong> mais similaire</li>
+            <li>À chaque tour, donnez un <strong>indice</strong> lié à votre mot</li>
+            <li>Après tous les tours, <strong>votez</strong> pour éliminer l'imposteur</li>
+            <li>L'imposteur doit se fondre dans la masse !</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lobby -->
+    <section id="lobby-screen" class="screen">
+      <div class="container">
+        <header class="lobby-header">
+          <h1>Salle d'attente</h1>
+          <div class="room-code-display">
+            <span>Code :</span>
+            <strong id="room-code">------</strong>
+            <button id="copy-code" class="btn-icon-only" title="Copier le code">
+              📋
+            </button>
+          </div>
+        </header>
+
+        <div class="players-section">
+          <h2>Joueurs <span id="player-count">(0/10)</span></h2>
+          <ul id="player-list" class="player-list"></ul>
+        </div>
+
+        <!-- Game Rules -->
+        <div class="rules-config" id="rules-config">
+          <h2>⚙️ Options de jeu</h2>
+          <div class="rules-options">
+            <label class="toggle-option">
+              <input type="checkbox" id="rule-show-impostor" checked>
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Révéler l'imposteur à lui-même</span>
+            </label>
+            <div class="rounds-selector">
+              <label>Tours par manche :</label>
+              <div class="rounds-buttons">
+                <button type="button" data-rounds="1" class="round-btn">1</button>
+                <button type="button" data-rounds="2" class="round-btn active">2</button>
+                <button type="button" data-rounds="3" class="round-btn">3</button>
+              </div>
+            </div>
+            <div class="rounds-selector">
+              <label>Nombre de manches :</label>
+              <div class="rounds-buttons" id="matches-buttons">
+                <button type="button" data-matches="3" class="match-btn">3</button>
+                <button type="button" data-matches="5" class="match-btn">5</button>
+                <button type="button" data-matches="10" class="match-btn active">10</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lobby-actions">
+          <button id="start-game-btn" class="btn btn-primary btn-large" disabled>
+            Lancer la partie
+          </button>
+          <p id="start-message" class="info-message">Il faut au moins 3 joueurs</p>
+        </div>
+
+        <button id="leave-lobby" class="btn btn-ghost">
+          ← Quitter la salle
+        </button>
+      </div>
+    </section>
+
+    <!-- Jeu -->
+    <section id="game-screen" class="screen">
+      <!-- Leaderboard Sidebar -->
+      <aside id="leaderboard-sidebar" class="leaderboard-sidebar">
+        <h3>🏆 Classement</h3>
+        <div class="match-info">
+          Manche <span id="current-match">1</span>/<span id="max-matches">10</span>
+        </div>
+        <div id="leaderboard-list" class="leaderboard-list"></div>
+      </aside>
+
+      <div class="container game-container">
+        <div class="word-reveal compact">
+          <span class="word-label">Votre mot :</span>
+          <span id="secret-word" class="secret-word">??????</span>
+          <span id="impostor-alert" class="impostor-badge hidden">🕵️ Imposteur</span>
+        </div>
+
+        <div class="hint-section compact">
+          <form id="hint-form" class="hint-form-inline">
+            <input type="text" id="hint-input" placeholder="Votre indice" maxlength="30" required autocomplete="off">
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+          </form>
+          <p id="hint-status" class="hint-status"></p>
+        </div>
+
+        <div class="hints-history">
+          <div id="hints-grid" class="hints-grid"></div>
+        </div>
+
+        <div class="vote-control hidden" id="vote-control">
+          <button id="start-voting-btn" class="btn btn-primary btn-large">
+            🗳️ Lancer les votes
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vote -->
+    <section id="vote-screen" class="screen">
+      <div class="container">
+        <header class="vote-header">
+          <h1>🗳️ Phase de vote</h1>
+          <p>Qui est l'imposteur ?</p>
+        </header>
+
+        <div id="vote-players" class="vote-players"></div>
+
+        <div id="vote-status" class="vote-status">
+          <p>En attente des votes...</p>
+          <div id="voters-status"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Résultats -->
+    <section id="result-screen" class="screen">
+      <!-- Leaderboard Sidebar (aussi visible sur résultats) -->
+      <aside id="result-leaderboard" class="leaderboard-sidebar">
+        <h3>🏆 Classement</h3>
+        <div class="match-info">
+          Manche <span id="result-current-match">1</span>/<span id="result-max-matches">10</span>
+        </div>
+        <div id="result-leaderboard-list" class="leaderboard-list"></div>
+      </aside>
+
+      <div class="container result-container">
+        <div id="result-content" class="result-content">
+          <!-- Contenu dynamique -->
+        </div>
+
+        <div class="result-actions">
+          <button id="next-match-btn" class="btn btn-primary btn-large hidden">
+            Manche suivante
+          </button>
+          <button id="play-again-btn" class="btn btn-primary btn-large hidden">
+            Nouvelle partie
+          </button>
+          <button id="back-home-btn" class="btn btn-ghost">
+            Retour à l'accueil
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toast notifications -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
