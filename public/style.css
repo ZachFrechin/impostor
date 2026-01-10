@@ -523,113 +523,84 @@ input:focus {
   margin-bottom: 12px;
 }
 
-.secret-word {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--accent);
-}
-
-/* Compact word display */
-.word-reveal.compact {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.word-reveal.compact .word-label {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.word-reveal.compact .secret-word {
-  font-size: 1.5rem;
-}
-
-.impostor-badge {
-  background: var(--danger);
-  color: white;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.impostor-alert {
-  margin-top: 16px;
-  padding: 12px 16px;
-  background: rgba(244, 92, 67, 0.15);
-  border: 1px solid rgba(244, 92, 67, 0.3);
-  border-radius: var(--radius-md);
-  color: var(--danger);
-  font-weight: 500;
-}
-
 .hidden {
   display: none !important;
 }
 
-.hint-section {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  border: 1px solid var(--border-color);
-  margin-bottom: 24px;
-}
-
-/* Compact hint section */
-.hint-section.compact {
-  padding: 12px 16px;
-  margin-bottom: 12px;
-}
-
-.hint-form-inline {
+/* ===== SIMPLIFIED GAME LAYOUT ===== */
+.game-main {
+  margin-left: 180px;
+  padding: 32px 48px;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
   align-items: center;
+  gap: 24px;
+  min-height: 100vh;
 }
 
-.hint-form-inline input {
-  flex: 1;
-  padding: 10px 14px;
+/* Big word display */
+.word-display {
+  text-align: center;
+  margin-bottom: 16px;
 }
 
-.hint-form-inline .btn {
-  white-space: nowrap;
-  padding: 10px 16px;
+.big-word {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 8px;
 }
 
-.hint-section form {
+.impostor-tag {
+  display: inline-block;
+  background: var(--danger);
+  color: white;
+  padding: 6px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Clean hint form */
+.hint-form {
   display: flex;
   gap: 12px;
+  width: 100%;
+  max-width: 500px;
 }
 
-.hint-section input {
+.hint-form input {
   flex: 1;
+  padding: 12px 16px;
+  font-size: 1rem;
 }
 
-.hint-section .btn {
+.hint-form .btn {
+  padding: 12px 24px;
   white-space: nowrap;
 }
 
 .hint-status {
-  margin-top: 8px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
+  text-align: center;
 }
 
 .hint-status.my-turn {
   color: var(--accent);
   font-weight: 600;
-  font-size: 1rem;
-  padding: 8px 12px;
-  background: var(--bg-card-hover);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-sm);
+}
+
+/* Accent button for vote */
+.btn-accent {
+  background: var(--success);
+  color: white;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  border: none;
+  margin-top: 16px;
 }
 
 /* Turn-by-turn: Current player highlight */
@@ -1184,6 +1155,68 @@ input:focus {
   color: white;
 }
 
+/* Advanced Options */
+.advanced-options {
+  margin-top: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.advanced-options summary {
+  padding: 12px 16px;
+  background: var(--bg-card);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.advanced-options summary:hover {
+  color: var(--text-primary);
+}
+
+.advanced-options[open] summary {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 12px;
+}
+
+.category-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-toggle:has(input:checked) {
+  border-color: var(--accent);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.category-toggle input {
+  display: none;
+}
+
+.category-toggle span {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.category-toggle small {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 /* ===== Hints Grid (Columns per Player) ===== */
 .hints-grid {
   display: flex;
@@ -1404,9 +1437,8 @@ input:focus {
   position: relative;
 }
 
-#game-screen .game-container,
 #result-screen .result-container {
-  margin-left: 220px;
+  margin-left: 200px;
   padding-left: 24px;
 }
 

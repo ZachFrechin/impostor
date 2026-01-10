@@ -134,6 +134,83 @@
               </div>
             </div>
           </div>
+
+          <!-- Options avancées -->
+          <details class="advanced-options">
+            <summary>🎲 Catégories de mots</summary>
+            <div class="categories-grid">
+              <label class="category-toggle">
+                <input type="checkbox" data-category="animals" checked>
+                <span>🦁 Animaux</span>
+                <small>Sauvages, domestiques, marins...</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="food" checked>
+                <span>🍔 Gastronomie</span>
+                <small>Plats, desserts, boissons</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="jobs" checked>
+                <span>💼 Métiers</span>
+                <small>Professions, rôles, statuts</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="home" checked>
+                <span>🏠 Maison</span>
+                <small>Objets, meubles, pièces</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="sports" checked>
+                <span>🏆 Sports</span>
+                <small>Disciplines, athlètes</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="nature" checked>
+                <span>� Nature</span>
+                <small>Plantes, météo, paysages</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="history" checked>
+                <span>📜 Histoire</span>
+                <small>Guerres, personnages, époques</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="tech" checked>
+                <span>💻 Tech</span>
+                <small>Gadgets, informatique, marques</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="classic" checked>
+                <span>🌈 Général</span>
+                <small>Couleurs, corps humain</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="culture" checked>
+                <span>🎬 Culture</span>
+                <small>Arts, littérature, musique</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="geo" checked>
+                <span>🌍 Géo</span>
+                <small>Pays, villes, lieux</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="fun" checked>
+                <span>🎮 Fun</span>
+                <small>Jeux, héros, fantastique</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="science" checked>
+                <span>🔬 Science</span>
+                <small>Espace, bio, physique</small>
+              </label>
+              <label class="category-toggle">
+                <input type="checkbox" data-category="opposites" checked>
+                <span>☯️ Opposés</span>
+                <small>Concepts, contrastes</small>
+              </label>
+            </div>
+          </details>
         </div>
 
         <div class="lobby-actions">
@@ -153,37 +230,31 @@
     <section id="game-screen" class="screen">
       <!-- Leaderboard Sidebar -->
       <aside id="leaderboard-sidebar" class="leaderboard-sidebar">
-        <h3>🏆 Classement</h3>
         <div class="match-info">
           Manche <span id="current-match">1</span>/<span id="max-matches">10</span>
         </div>
         <div id="leaderboard-list" class="leaderboard-list"></div>
       </aside>
 
-      <div class="container game-container">
-        <div class="word-reveal compact">
-          <span class="word-label">Votre mot :</span>
-          <span id="secret-word" class="secret-word">??????</span>
-          <span id="impostor-alert" class="impostor-badge hidden">🕵️ Imposteur</span>
+      <div class="game-main">
+        <!-- Mot secret - bien visible -->
+        <div class="word-display">
+          <span id="secret-word" class="big-word">??????</span>
+          <span id="impostor-alert" class="impostor-tag hidden">🕵️ IMPOSTEUR</span>
         </div>
 
-        <div class="hint-section compact">
-          <form id="hint-form" class="hint-form-inline">
-            <input type="text" id="hint-input" placeholder="Votre indice" maxlength="30" required autocomplete="off">
-            <button type="submit" class="btn btn-primary">Envoyer</button>
-          </form>
-          <p id="hint-status" class="hint-status"></p>
-        </div>
+        <!-- Zone d'indice -->
+        <form id="hint-form" class="hint-form">
+          <input type="text" id="hint-input" placeholder="Votre indice..." maxlength="30" required autocomplete="off">
+          <button type="submit" class="btn btn-primary">Envoyer</button>
+        </form>
+        <div id="hint-status" class="hint-status"></div>
 
-        <div class="hints-history">
-          <div id="hints-grid" class="hints-grid"></div>
-        </div>
+        <!-- Indices des joueurs -->
+        <div id="hints-grid" class="hints-grid"></div>
 
-        <div class="vote-control hidden" id="vote-control">
-          <button id="start-voting-btn" class="btn btn-primary btn-large">
-            🗳️ Lancer les votes
-          </button>
-        </div>
+        <!-- Bouton vote (hôte seulement) -->
+        <button id="start-voting-btn" class="btn btn-accent hidden">🗳️ Lancer les votes</button>
       </div>
     </section>
 

@@ -65,7 +65,6 @@ const elements = {
 	hintStatus: document.getElementById('hint-status'),
 	hintsGrid: document.getElementById('hints-grid'),
 	leaderboardList: document.getElementById('leaderboard-list'),
-	voteControl: document.getElementById('vote-control'),
 	startVotingBtn: document.getElementById('start-voting-btn'),
 
 	// Vote
@@ -229,8 +228,8 @@ function initSocket() {
 		updateTurnStatus();
 
 		// Afficher le bouton de vote pour l'hôte dès le début
-		if (state.isHost && elements.voteControl) {
-			elements.voteControl.classList.remove('hidden');
+		if (state.isHost && elements.startVotingBtn) {
+			elements.startVotingBtn.classList.remove('hidden');
 		}
 
 		showScreen('game');
@@ -281,8 +280,8 @@ function initSocket() {
 		updateTurnStatus();
 
 		// Afficher le bouton de vote pour l'hôte
-		if (state.isHost && elements.voteControl) {
-			elements.voteControl.classList.remove('hidden');
+		if (state.isHost && elements.startVotingBtn) {
+			elements.startVotingBtn.classList.remove('hidden');
 		}
 
 		showScreen('game');
@@ -337,8 +336,8 @@ function initSocket() {
 	// === L'hôte peut lancer les votes ===
 	state.socket.on('ready-to-vote', ({ hostId }) => {
 		// Afficher le bouton pour l'hôte
-		if (state.isHost && elements.voteControl) {
-			elements.voteControl.classList.remove('hidden');
+		if (state.isHost && elements.startVotingBtn) {
+			elements.startVotingBtn.classList.remove('hidden');
 		}
 		elements.hintStatus.textContent = '✅ Tous les indices ont été donnés !';
 		elements.hintStatus.classList.remove('my-turn');
@@ -348,8 +347,8 @@ function initSocket() {
 	// === Phase de vote ===
 	state.socket.on('voting-phase', ({ players }) => {
 		// Cacher le bouton de vote si visible
-		if (elements.voteControl) {
-			elements.voteControl.classList.add('hidden');
+		if (elements.startVotingBtn) {
+			elements.startVotingBtn.classList.add('hidden');
 		}
 		state.hasVoted = false;
 		renderVotingCards(players);
@@ -646,10 +645,17 @@ function escapeHtml(text) {
 
 // ===== Game Rules =====
 function getGameRules() {
+	// Collect selected categories from checkboxes
+	const categoryCheckboxes = document.querySelectorAll('[data-category]');
+	const categories = Array.from(categoryCheckboxes)
+		.filter(cb => cb.checked)
+		.map(cb => cb.dataset.category);
+
 	return {
 		showImpostorBanner: elements.ruleShowImpostor?.checked ?? true,
 		maxRounds: state.maxRounds,
-		maxMatches: state.maxMatches
+		maxMatches: state.maxMatches,
+		categories: categories.length > 0 ? categories : ['classic', 'culture', 'fun', 'geo', 'science', 'opposites', 'food', 'animals', 'jobs', 'home', 'history', 'sports', 'nature', 'tech']
 	};
 }
 

@@ -2,7 +2,7 @@ const express = require('express');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const { getRandomWordPair } = require('./words');
+const { getRandomWordPair } = require('./words/index');
 
 const app = express();
 const server = createServer(app);
@@ -87,6 +87,7 @@ function createRoom(hostId, hostName) {
 		maxRounds: 2,
 		currentMatch: 0,
 		maxMatches: 10,
+		categories: ['classic', 'culture', 'fun', 'geo', 'science', 'opposites', 'food', 'animals', 'jobs', 'home', 'history', 'sports', 'nature', 'tech'], // Active word categories
 		wordPair: null,
 		impostorId: null,
 		currentPlayerIndex: 0,
@@ -149,8 +150,8 @@ function startGame(room) {
 	const impostorIndex = Math.floor(Math.random() * room.players.length);
 	room.impostorId = room.players[impostorIndex].id;
 
-	// Sélectionner une paire de mots
-	room.wordPair = getRandomWordPair();
+	// Sélectionner une paire de mots (selon les catégories actives)
+	room.wordPair = getRandomWordPair(room.categories);
 
 	// Distribuer les mots
 	room.players.forEach(player => {
@@ -380,6 +381,10 @@ io.on('connection', (socket) => {
 		room.maxRounds = rules.maxRounds || 2;
 		room.maxMatches = rules.maxMatches || 10;
 		room.showImpostorBanner = rules.showImpostorBanner !== false;
+		// Categories selection (default all)
+		if (rules.categories && rules.categories.length > 0) {
+			room.categories = rules.categories;
+		}
 
 		startGame(room);
 

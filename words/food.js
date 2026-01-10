@@ -1,0 +1,73 @@
+// Catégorie Gastronomie : Cuisine, Boissons, Desserts, Ingrédients
+module.exports = [
+	// Plats
+	{ citizen: "Pizza", impostor: "Hamburger" },
+	{ citizen: "Spaghetti", impostor: "Lasagne" },
+	{ citizen: "Sushi", impostor: "Maki" },
+	{ citizen: "Steak", impostor: "Saucisse" },
+	{ citizen: "Crêpe", impostor: "Gaufre" },
+	{ citizen: "Sandwich", impostor: "Burger" },
+	{ citizen: "Salade", impostor: "Soupe" },
+	{ citizen: "Kebab", impostor: "Tacos" },
+	{ citizen: "Raclette", impostor: "Fondue" },
+	{ citizen: "Paella", impostor: "Risotto" },
+	{ citizen: "Couscous", impostor: "Tajine" },
+	{ citizen: "Quiche", impostor: "Tarte" },
+	{ citizen: "Omelette", impostor: "Oeuf sur le plat" },
+	{ citizen: "Purée", impostor: "Frites" },
+	{ citizen: "Ravioli", impostor: "Tortellini" },
+
+	// Desserts et Sucreries
+	{ citizen: "Croissant", impostor: "Brioche" },
+	{ citizen: "Gâteau", impostor: "Tarte" },
+	{ citizen: "Glace", impostor: "Sorbet" },
+	{ citizen: "Chocolat", impostor: "Caramel" },
+	{ citizen: "Miel", impostor: "Confiture" },
+	{ citizen: "Yaourt", impostor: "Crème dessert" },
+	{ citizen: "Donut", impostor: "Beignet" },
+	{ citizen: "Macaron", impostor: "Meringue" },
+	{ citizen: "Éclair", impostor: "Religieuse" },
+	{ citizen: "Tiramisu", impostor: "Mousse au chocolat" },
+	{ citizen: "Compote", impostor: "Fruit" },
+	{ citizen: "Popcorn", impostor: "Chips" },
+	{ citizen: "Bonbon", impostor: "Chewing-gum" },
+
+	// Fruits et Légumes
+	{ citizen: "Pomme", impostor: "Poire" },
+	{ citizen: "Banane", impostor: "Ananas" },
+	{ citizen: "Fraise", impostor: "Framboise" },
+	{ citizen: "Orange", impostor: "Mandarine" },
+	{ citizen: "Cerise", impostor: "Raisin" },
+	{ citizen: "Pêche", impostor: "Abricot" },
+	{ citizen: "Citron", impostor: "Pamplemousse" },
+	{ citizen: "Melon", impostor: "Pastèque" },
+	{ citizen: "Tomate", impostor: "Concombre" },
+	{ citizen: "Carotte", impostor: "Radis" },
+	{ citizen: "Pomme de terre", impostor: "Patate douce" },
+	{ citizen: "Courgette", impostor: "Aubergine" },
+	{ citizen: "Oignon", impostor: "Ail" },
+	{ citizen: "Salade", impostor: "Épinard" },
+	{ citizen: "Haricot", impostor: "Petit pois" },
+	{ citizen: "Noix", impostor: "Noisette" },
+	{ citizen: "Amande", impostor: "Cacahuète" },
+
+	// Boissons
+	{ citizen: "Café", impostor: "Thé" },
+	{ citizen: "Bière", impostor: "Vin" },
+	{ citizen: "Eau", impostor: "Soda" },
+	{ citizen: "Jus", impostor: "Sirop" },
+	{ citizen: "Lait", impostor: "Chocolat chaud" },
+	{ citizen: "Champagne", impostor: "Cidre" },
+	{ citizen: "Whisky", impostor: "Vodka" },
+	{ citizen: "Mojito", impostor: "Margarita" },
+
+	// Condiments et Autres
+	{ citizen: "Sel", impostor: "Poivre" },
+	{ citizen: "Ketchup", impostor: "Mayonnaise" },
+	{ citizen: "Moutarde", impostor: "Sauce barbecue" },
+	{ citizen: "Huile", impostor: "Vinaigre" },
+	{ citizen: "Sucre", impostor: "Farine" },
+	{ citizen: "Pain", impostor: "Toast" },
+	{ citizen: "Baguette", impostor: "Miche" },
+	{ citizen: "Fromage", impostor: "Beurre" }
+];
