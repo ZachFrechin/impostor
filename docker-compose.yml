@@ -6,7 +6,7 @@ services:
     container_name: impostor-game
     restart: unless-stopped
     expose:
-      - "40401:3000"
+      - "3000"
     environment:
       - NODE_ENV=production
       - PORT=3000

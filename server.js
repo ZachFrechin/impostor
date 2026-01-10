@@ -8,10 +8,12 @@ const app = express();
 const server = createServer(app);
 
 // Support for reverse proxy with sub-path (e.g., /impostor/)
+// Note: nginx strips the BASE_PATH, so Socket.io listens on /socket.io
+// but the client needs to use BASE_PATH + /socket.io for the full URL
 const BASE_PATH = process.env.BASE_PATH || '';
 
 const io = new Server(server, {
-	path: `${BASE_PATH}/socket.io`,
+	path: '/socket.io', // nginx strips BASE_PATH, so just use /socket.io
 	cors: {
 		origin: "*",
 		methods: ["GET", "POST"]
