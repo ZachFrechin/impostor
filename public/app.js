@@ -131,7 +131,10 @@ function getPlayerIndex(playerId) {
 
 // ===== Initialisation Socket.io =====
 function initSocket() {
-	state.socket = io();
+	const basePath = window.BASE_PATH || '';
+	state.socket = io({
+		path: `${basePath}/socket.io`
+	});
 
 	// === Événements de salle ===
 	state.socket.on('room-created', ({ roomCode }) => {

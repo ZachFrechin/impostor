@@ -6,7 +6,12 @@ const { getRandomWordPair } = require('./words');
 
 const app = express();
 const server = createServer(app);
+
+// Support for reverse proxy with sub-path (e.g., /impostor/)
+const BASE_PATH = process.env.BASE_PATH || '';
+
 const io = new Server(server, {
+	path: `${BASE_PATH}/socket.io`,
 	cors: {
 		origin: "*",
 		methods: ["GET", "POST"]
@@ -15,8 +20,23 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
+// Injecter le BASE_PATH dans le HTML
+app.get('/', (req, res) => {
+	res.send(getHtmlWithBasePath());
+});
+
 // Servir les fichiers statiques
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Fonction pour générer le HTML avec le bon path
+function getHtmlWithBasePath() {
+	const fs = require('fs');
+	let html = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
+	// Injecter le BASE_PATH comme variable globale
+	const scriptTag = `<script>window.BASE_PATH = "${BASE_PATH}";</script>`;
+	html = html.replace('</head>', `${scriptTag}</head>`);
+	return html;
+}
 
 // État des salles en mémoire
 const rooms = new Map();

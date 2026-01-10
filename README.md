@@ -69,9 +69,31 @@ docker run -p 3000:3000 impostor-game
 
 ## ⚙️ Configuration
 
-| Variable | Par défaut | Description |
-|----------|------------|-------------|
-| `PORT`   | 3000       | Port du serveur |
+| Variable    | Par défaut | Description |
+|-------------|------------|-------------|
+| `PORT`      | 3000       | Port du serveur |
+| `BASE_PATH` | (vide)     | Chemin de base pour reverse proxy (ex: `/impostor`) |
+
+### Déploiement avec Nginx (reverse proxy)
+
+Si vous utilisez nginx avec un sous-chemin (ex: `https://monsite.com/impostor/`), configurez :
+
+**docker-compose.yml :**
+```yaml
+environment:
+  - BASE_PATH=/impostor
+```
+
+**nginx.conf :**
+```nginx
+location /impostor/ {
+    proxy_pass http://localhost:3000/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+}
+```
 
 ## 📜 Licence
 
