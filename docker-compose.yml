@@ -5,15 +5,14 @@ services:
     build: .
     container_name: impostor-game
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    expose:
+      - "40401:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - BASE_PATH=/impostor
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+    networks:
+      - resv-network
+
+networks:
+  resv-network:
+    external: true
