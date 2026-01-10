@@ -32,9 +32,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 function getHtmlWithBasePath() {
 	const fs = require('fs');
 	let html = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
+
 	// Injecter le BASE_PATH comme variable globale
 	const scriptTag = `<script>window.BASE_PATH = "${BASE_PATH}";</script>`;
 	html = html.replace('</head>', `${scriptTag}</head>`);
+
+	// Corriger le chemin vers socket.io.js
+	html = html.replace('/socket.io/socket.io.js', `${BASE_PATH}/socket.io/socket.io.js`);
+
 	return html;
 }
 
