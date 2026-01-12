@@ -438,6 +438,82 @@ io.on('connection', (socket) => {
 		}
 
 		if (room.state !== 'lobby') {
+			// Check if player with this name exists and is disconnected - allow rejoin
+			const existingPlayer = room.players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
+			if (existingPlayer && !existingPlayer.connected) {
+				// Rejoin as existing player
+				const oldId = existingPlayer.id;
+				existingPlayer.id = socket.id;
+				existingPlayer.connected = true;
+
+				// Cancel pending disconnect timeout
+				if (pendingDisconnects.has(oldId)) {
+					clearTimeout(pendingDisconnects.get(oldId));
+					pendingDisconnects.delete(oldId);
+				}
+
+				// Update session mapping
+				const newSessionToken = generateSessionToken();
+				if (existingPlayer.sessionToken) {
+					playerSessions.delete(existingPlayer.sessionToken);
+				}
+				existingPlayer.sessionToken = newSessionToken;
+				playerSessions.set(newSessionToken, { roomCode: room.code, playerId: socket.id, playerName });
+
+				// Update host ID if this was the host
+				if (room.hostId === oldId) {
+					room.hostId = socket.id;
+				}
+
+				// Update scores mapping
+				if (room.scores[oldId] !== undefined) {
+					room.scores[socket.id] = room.scores[oldId];
+					delete room.scores[oldId];
+				}
+
+				// Update impostor ID if this was the impostor
+				if (room.impostorId === oldId) {
+					room.impostorId = socket.id;
+				}
+
+				// Update playOrder if exists
+				if (room.playOrder) {
+					const orderIndex = room.playOrder.findIndex(p => p.id === oldId);
+					if (orderIndex >= 0) {
+						room.playOrder[orderIndex] = existingPlayer;
+					}
+				}
+
+				currentRoom = room.code;
+				socket.join(room.code);
+
+				console.log(`Joueur rejoint par nom: ${existingPlayer.name} (${oldId} -> ${socket.id})`);
+
+				// Send full game state
+				socket.emit('reconnected', {
+					roomCode: room.code,
+					sessionToken: newSessionToken,
+					playerName: existingPlayer.name,
+					isHost: existingPlayer.isHost,
+					gameState: room.state,
+					word: existingPlayer.word,
+					isImpostor: existingPlayer.isImpostor,
+					currentRound: room.currentRound,
+					maxRounds: room.maxRounds,
+					currentMatch: room.currentMatch,
+					maxMatches: room.maxMatches,
+					players: room.players.map(p => ({ id: p.id, name: p.name, isHost: p.isHost, connected: p.connected })),
+					scores: room.scores
+				});
+
+				// Notify others
+				io.to(room.code).emit('player-reconnected', { playerId: socket.id, playerName: existingPlayer.name });
+				io.to(room.code).emit('room-update', {
+					players: room.players.map(p => ({ id: p.id, name: p.name, isHost: p.isHost, connected: p.connected })),
+					state: room.state
+				});
+				return;
+			}
 			socket.emit('error', { message: 'La partie a déjà commencé' });
 			return;
 		}
@@ -447,7 +523,7 @@ io.on('connection', (socket) => {
 			return;
 		}
 
-		// Vérifier que le nom n'est pas déjà pris
+		// Vérifier que le nom n'est pas déjà pris (par un joueur connecté)
 		if (room.players.some(p => p.name.toLowerCase() === playerName.toLowerCase() && p.connected)) {
 			socket.emit('error', { message: 'Ce nom est déjà utilisé' });
 			return;

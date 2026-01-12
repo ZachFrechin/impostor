@@ -420,11 +420,16 @@ function initSocket() {
 	});
 
 	// ===== Reconnection =====
-	state.socket.on('reconnected', ({ roomCode, playerName, isHost, gameState, word, isImpostor, currentRound, maxRounds, currentMatch, maxMatches, players, scores }) => {
+	state.socket.on('reconnected', ({ roomCode, sessionToken, playerName, isHost, gameState, word, isImpostor, currentRound, maxRounds, currentMatch, maxMatches, players, scores }) => {
 		console.log('Reconnected to game:', roomCode);
 		state.roomCode = roomCode;
 		state.isHost = isHost;
 		state.players = players;
+
+		// Save new session token if provided (for manual rejoin by name)
+		if (sessionToken) {
+			saveSession(roomCode, sessionToken, playerName);
+		}
 
 		elements.roomCode.textContent = roomCode;
 		updatePlayerList(players);
