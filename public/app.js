@@ -80,6 +80,11 @@ const elements = {
 	resultMaxMatches: document.getElementById('result-max-matches'),
 	resultLeaderboardList: document.getElementById('result-leaderboard-list'),
 
+	// Chat
+	chatForm: document.getElementById('chat-form'),
+	chatInput: document.getElementById('chat-input'),
+	chatMessages: document.getElementById('chat-messages'),
+
 	// Toast
 	toast: document.getElementById('toast')
 };
@@ -128,6 +133,38 @@ function getPlayerIndex(playerId) {
 	return state.players.findIndex(p => p.id === playerId);
 }
 
+// ===== Session Management =====
+const SESSION_KEY = 'impostor-session';
+
+function saveSession(roomCode, sessionToken, playerName) {
+	localStorage.setItem(SESSION_KEY, JSON.stringify({
+		roomCode,
+		sessionToken,
+		playerName,
+		timestamp: Date.now()
+	}));
+}
+
+function getSession() {
+	try {
+		const data = localStorage.getItem(SESSION_KEY);
+		if (!data) return null;
+		const session = JSON.parse(data);
+		// Session expires after 1 hour
+		if (Date.now() - session.timestamp > 3600000) {
+			clearSession();
+			return null;
+		}
+		return session;
+	} catch {
+		return null;
+	}
+}
+
+function clearSession() {
+	localStorage.removeItem(SESSION_KEY);
+}
+
 // ===== Initialisation Socket.io =====
 function initSocket() {
 	const basePath = window.BASE_PATH || '';
@@ -135,18 +172,28 @@ function initSocket() {
 		path: `${basePath}/socket.io`
 	});
 
+	// Try to reconnect existing session
+	const existingSession = getSession();
+	if (existingSession) {
+		state.socket.emit('reconnect-session', { sessionToken: existingSession.sessionToken });
+	}
+
 	// === Événements de salle ===
-	state.socket.on('room-created', ({ roomCode }) => {
+	state.socket.on('room-created', ({ roomCode, sessionToken }) => {
 		state.roomCode = roomCode;
 		state.isHost = true;
+		const playerName = elements.createName.value.trim();
+		saveSession(roomCode, sessionToken, playerName);
 		elements.roomCode.textContent = roomCode;
 		updateRulesVisibility();
 		showScreen('lobby');
 		showToast('Salle créée !', 'success');
 	});
 
-	state.socket.on('room-joined', ({ roomCode }) => {
+	state.socket.on('room-joined', ({ roomCode, sessionToken }) => {
 		state.roomCode = roomCode;
+		const playerName = elements.joinName.value.trim();
+		saveSession(roomCode, sessionToken, playerName);
 		elements.roomCode.textContent = roomCode;
 		updateRulesVisibility();
 		showScreen('lobby');
@@ -333,6 +380,12 @@ function initSocket() {
 		}
 	});
 
+	// === Joueur déconnecté - Auto-skip ===
+	state.socket.on('player-disconnected-turn', ({ playerName, skipInSeconds }) => {
+		elements.hintStatus.textContent = `⏳ ${playerName} déconnecté - Passage auto dans ${skipInSeconds}s...`;
+		elements.hintStatus.classList.add('disconnected-turn');
+	});
+
 	// === L'hôte peut lancer les votes ===
 	state.socket.on('ready-to-vote', ({ hostId }) => {
 		// Afficher le bouton pour l'hôte
@@ -366,7 +419,61 @@ function initSocket() {
 		showScreen('result');
 	});
 
-	// === Erreurs ===
+	// ===== Reconnection =====
+	state.socket.on('reconnected', ({ roomCode, playerName, isHost, gameState, word, isImpostor, currentRound, maxRounds, currentMatch, maxMatches, players, scores }) => {
+		console.log('Reconnected to game:', roomCode);
+		state.roomCode = roomCode;
+		state.isHost = isHost;
+		state.players = players;
+
+		elements.roomCode.textContent = roomCode;
+		updatePlayerList(players);
+
+		if (gameState === 'lobby') {
+			showScreen('lobby');
+			showToast('🔄 Session restaurée !', 'success');
+		} else if (gameState === 'playing') {
+			state.isImpostor = isImpostor;
+			elements.secretWord.textContent = word || '??????';
+			elements.currentMatch.textContent = currentMatch;
+			elements.maxMatches.textContent = maxMatches;
+			if (isImpostor && elements.impostorAlert) {
+				elements.impostorAlert.classList.remove('hidden');
+			}
+			renderLeaderboard(scores, players);
+			clearChat();
+			showScreen('game');
+			showToast('🔄 Partie restaurée !', 'success');
+		} else if (gameState === 'voting') {
+			renderVotingCards(players);
+			showScreen('vote');
+			showToast('🔄 Session restaurée, votez !', 'success');
+		} else {
+			showScreen('lobby');
+			showToast('🔄 Session restaurée !', 'success');
+		}
+	});
+
+	state.socket.on('reconnect-failed', ({ message }) => {
+		console.log('Reconnection failed:', message);
+		clearSession();
+		// Stay on home screen, session expired
+	});
+
+	state.socket.on('player-disconnected', ({ playerName }) => {
+		addChatMessage(null, `⚠️ ${playerName} s'est déconnecté`, true);
+	});
+
+	state.socket.on('player-reconnected', ({ playerName }) => {
+		addChatMessage(null, `✅ ${playerName} s'est reconnecté`, true);
+		showToast(`${playerName} est de retour !`, 'success');
+	});
+
+	// ===== Chat =====
+	state.socket.on('chat-message', ({ playerName, message }) => {
+		addChatMessage(playerName, message);
+	});
+
 	state.socket.on('error', ({ message }) => {
 		showToast(message, 'error');
 	});
@@ -759,6 +866,35 @@ document.querySelectorAll('.match-btn').forEach(btn => {
 		state.maxMatches = parseInt(btn.dataset.matches);
 	});
 });
+// ===== Chat =====
+elements.chatForm?.addEventListener('submit', (e) => {
+	e.preventDefault();
+	const message = elements.chatInput.value.trim();
+	if (!message) return;
+
+	state.socket.emit('chat-message', { message });
+	elements.chatInput.value = '';
+});
+
+function addChatMessage(playerName, message, isSystem = false) {
+	const msgDiv = document.createElement('div');
+	msgDiv.className = 'chat-message' + (isSystem ? ' system' : '');
+
+	if (isSystem) {
+		msgDiv.textContent = message;
+	} else {
+		msgDiv.innerHTML = `<span class="chat-author">${escapeHtml(playerName)}:</span><span class="chat-text">${escapeHtml(message)}</span>`;
+	}
+
+	elements.chatMessages?.appendChild(msgDiv);
+	elements.chatMessages?.scrollTo(0, elements.chatMessages.scrollHeight);
+}
+
+function clearChat() {
+	if (elements.chatMessages) {
+		elements.chatMessages.innerHTML = '';
+	}
+}
 
 // ===== Démarrage =====
 document.addEventListener('DOMContentLoaded', () => {

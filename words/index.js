@@ -34,6 +34,7 @@ const categories = {
 
 /**
  * Retourne une paire de mots aléatoire parmi les catégories sélectionnées
+ * L'attribution citizen/impostor est randomisée (50% de chance d'inversion)
  * @param {string[]} selectedCategories - Liste des catégories à utiliser (ex: ['classic', 'fun'])
  * @returns {{ citizen: string, impostor: string }}
  */
@@ -49,11 +50,22 @@ function getRandomWordPair(selectedCategories = null) {
 	if (allWords.length === 0) {
 		// Fallback: utiliser classic
 		const index = Math.floor(Math.random() * classic.length);
-		return classic[index];
+		const pair = classic[index];
+		// Randomiser l'attribution
+		if (Math.random() < 0.5) {
+			return { citizen: pair.citizen, impostor: pair.impostor };
+		}
+		return { citizen: pair.impostor, impostor: pair.citizen };
 	}
 
 	const index = Math.floor(Math.random() * allWords.length);
-	return allWords[index];
+	const pair = allWords[index];
+
+	// Randomiser l'attribution (50% de chance d'inverser)
+	if (Math.random() < 0.5) {
+		return { citizen: pair.citizen, impostor: pair.impostor };
+	}
+	return { citizen: pair.impostor, impostor: pair.citizen };
 }
 
 /**
