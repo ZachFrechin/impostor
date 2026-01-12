@@ -421,10 +421,11 @@ function initSocket() {
 
 	// ===== Reconnection =====
 	state.socket.on('reconnected', ({ roomCode, sessionToken, playerName, isHost, gameState, word, isImpostor, currentRound, maxRounds, currentMatch, maxMatches, players, scores }) => {
-		console.log('Reconnected to game:', roomCode);
+		console.log('Reconnected to game:', roomCode, 'gameState:', gameState, 'word:', word);
 		state.roomCode = roomCode;
 		state.isHost = isHost;
 		state.players = players;
+		state.isImpostor = isImpostor;
 
 		// Save new session token if provided (for manual rejoin by name)
 		if (sessionToken) {
@@ -434,16 +435,19 @@ function initSocket() {
 		elements.roomCode.textContent = roomCode;
 		updatePlayerList(players);
 
+		// Restore game state based on current phase
 		if (gameState === 'lobby') {
+			updateRulesVisibility();
 			showScreen('lobby');
 			showToast('🔄 Session restaurée !', 'success');
 		} else if (gameState === 'playing') {
-			state.isImpostor = isImpostor;
 			elements.secretWord.textContent = word || '??????';
-			elements.currentMatch.textContent = currentMatch;
-			elements.maxMatches.textContent = maxMatches;
+			if (elements.currentMatch) elements.currentMatch.textContent = currentMatch;
+			if (elements.maxMatches) elements.maxMatches.textContent = maxMatches;
 			if (isImpostor && elements.impostorAlert) {
 				elements.impostorAlert.classList.remove('hidden');
+			} else if (elements.impostorAlert) {
+				elements.impostorAlert.classList.add('hidden');
 			}
 			renderLeaderboard(scores, players);
 			clearChat();
@@ -453,7 +457,14 @@ function initSocket() {
 			renderVotingCards(players);
 			showScreen('vote');
 			showToast('🔄 Session restaurée, votez !', 'success');
+		} else if (gameState === 'results' || gameState === 'match-results' || gameState === 'game-over') {
+			// For result screens, show lobby instead (can't restore mid-results)
+			updateRulesVisibility();
+			showScreen('lobby');
+			showToast('🔄 Reconnecté - En attente de la prochaine manche', 'success');
 		} else {
+			console.log('Unknown gameState:', gameState);
+			updateRulesVisibility();
 			showScreen('lobby');
 			showToast('🔄 Session restaurée !', 'success');
 		}
