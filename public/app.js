@@ -449,7 +449,8 @@ function initSocket() {
 			} else if (elements.impostorAlert) {
 				elements.impostorAlert.classList.add('hidden');
 			}
-			renderLeaderboard(scores, players);
+			state.scores = scores || {};
+			updateLeaderboard();
 			clearChat();
 			showScreen('game');
 			showToast('🔄 Partie restaurée !', 'success');
